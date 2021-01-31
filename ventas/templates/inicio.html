@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+    <section style="display: flex; padding: 15px">
+        <div id="searchbox" style="display: flex; flex-direction: column; width: 30%; padding-right: 15px">
+            <input type="text" placeholder=" Buscar producto..." id="txtProducto">
+            <select multiple id="listaProductos">
+            </select>
+            <br>
+            <button class="btn btn-danger" onclick="realizarVenta()" data-toggle="modal" data-target="#exampleModalCenter">REALIZAR VENTA</button>
+            <a class="btn btn-warning mt-2" href="{% url 'Ventas lista' %}">HISTORIAL DE VENTAS</a>
+        </div>
+        <table class="table table-bordered">
+            <theader class="thead-dark">
+                <tr>
+                    <th>Producto</th>
+                    <th style="width: 10%">Cantidad</th>
+                    <th style="width: 12%">Precio</th>
+                </tr>
+            </theader>
+            <tbody id="tbody-productos">
+
+            </tbody>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td>Total en Bs.</td>
+                    <td id="th-total">0</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Modal -->
+        <div class="modal fade" id="modalFactura" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Venta realizada con exito</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form  method="post">
+                {% csrf_token %}
+                  <div class="form-group">
+                      <label for="factura-nombre">Nombre</label>
+                      <input type="text" class="form-control" id="factura-nombre">
+                  </div>
+                    <div class="form-group">
+                      <label for="factura-nit">NIT</label>
+                      <input type="text" class="form-control" id="factura-nit">
+                  </div>
+                    <p style="text-align: center; color: red" id="mensaje-factura"></p>
+                    <div style="display: flex; justify-content: center">
+                    <div>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="reload()">OMITIR</button>
+                        <button type="button" class="btn btn-warning" onclick="emitirFactura()">EMITIR FACTURA</button>
+                    </div>
+                </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal -->
+
+{% endblock %}

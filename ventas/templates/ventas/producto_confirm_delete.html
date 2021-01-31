@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div style="text-align: center; padding-top: 14%">
+        <div style="margin-top: auto; margin-bottom: auto">
+            <h2>Eliminar producto</h2>
+            <br>
+            <form method="post">{% csrf_token %}
+                <p>¿Esta seguro que desea eliminar este producto "{{ object }}"?</p>
+                <a href="{% url 'Productos lista' %}" class="btn btn-warning">CANCELAR</a>
+                <input class="btn btn-danger" type="submit" value="CONFIRMAR">
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div style="text-align: center; padding-top: 5%">
+        <div style="margin-top: auto; margin-bottom: auto">
+            <h2>Ventas</h2>
+            <br>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <br>
+                <a href="{% url 'Ventas lista' %}" class="btn btn-danger">CANCELAR</a>
+                <input type="submit" class="btn btn-primary" value="GUARDAR">
+            </form>
+        </div>
+    </div>
+{% endblock %}

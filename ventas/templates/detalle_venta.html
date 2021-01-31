@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div style="display: flex; flex-direction:row ;justify-content: center; align-items: center; padding-top: 30px">
+        <div>
+            <a href="{% url 'Ventas lista' %}" class="btn btn-warning">Atrás</a>
+        </div>
+        {% if venta is not None %}
+            <div style="border: lightgrey solid 1px; padding: 10px; margin: 15px">
+                <strong>Fecha y hora</strong>
+                <p>{{ venta.fecha_hora }}</p>
+                <strong>Total</strong>
+                <p>Bs. {{ venta.total }}</p>
+                <strong>Nombre</strong>
+                {% if venta.factura_nombre is not None %}
+                    <p>{{ venta.factura_nombre }}</p>
+                    {% else %}
+                    <p>Sin nombre</p>
+                {% endif %}
+                <strong>NIT</strong>
+                {% if venta.factura_nit is not None %}
+                    <p>{{ venta.factura_nit }}</p>
+                    {% else %}
+                    <p>--</p>
+                {% endif %}
+                {% if venta.motivo_anulacion is not None %}
+                    <strong>Motivo de anulación</strong>
+                    <p>{{ venta.motivo_anulacion }}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+        {% if lista_detalles is not None %}
+            <table class="table table-bordered" style="width: 40%">
+                <thead>
+                    <tr>
+                        <th>Productos</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for producto in lista_detalles %}
+                    <tr>
+                        <td>{{ producto.fk_producto }}</td>
+                        <td>{{ producto.cantidad }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

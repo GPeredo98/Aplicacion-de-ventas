@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div style="display: flex; flex-direction:column ;justify-content: center; align-items: center; padding-top: 30px">
+        <div style="padding: 10px; display: flex; justify-content: space-between; width: 40%">
+            <h3>Categoria de productos</h3>
+            <div>
+                <a class="btn btn-warning" href="{% url 'Categoria crear' %}">Agregar categoria</a>
+            </div>
+        </div>
+        {% if categoria_list %}
+        <table class="table table-sm table-bordered" style="width: 40%">
+            <thead class="thead-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th style="width: 13%;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for categoria in categoria_list %}
+                    <tr>
+                        <td>{{ categoria.id }}</td>
+                        <td>{{ categoria.nombre }}</td>
+                        <td class="th-buttons">
+                            <a class="link-button" style="background: darkseagreen" href="{% url 'Categoria editar' categoria.id %}">
+                                <i class="fas fa-pen fa-fw"></i>
+                            </a>
+                            <a class="link-button" style="background: lightcoral" href="{% url 'Categoria eliminar' categoria.id %}">
+                                <i class="fas fa-trash-alt fa-fw"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <h2>No hay nada</h2>
+        {% endif %}
+    </div>
+{% endblock %}

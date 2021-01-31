@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Aplicación Ventas</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'ventas/style.css' %}">
+        <style>
+            .link-button {
+                text-align: center;
+                cursor: pointer;
+                min-width: 26px;
+                border-radius: 3px;
+                color: black;
+                text-decoration: none;
+            }
+
+            .th-buttons {
+                display: flex;
+                justify-content: space-evenly;
+            }
+        </style>
+    </head>
+    <body>
+        <header class="navbar sticky-top navbar-light bg-warning">
+            <a class="navbar-brand" href="{% url 'Index' %}">Aplicación de Ventas</a>
+            <div>
+                <a href="{% url 'Productos lista' %}" class="btn btn-light">Inventario de productos</a>
+                <a href="{% url 'Categoria lista' %}" class="btn btn-light">Categorias</a>
+            </div>
+        </header>
+        <main class="main">
+            {% block content %}
+
+            {% endblock %}
+        </main>
+        <footer class="footer bg-warning" style="margin-top: 30px">
+            <div class="footer-copyright text-center py-3">© Desarrollado por: Gabriel Peredo</div>
+        </footer>
+        <script src="https://kit.fontawesome.com/fba0fc5157.js" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+        <script>
+        let carrito = [];
+        let total_total = 0;
+        let ultimaVentaID = 0;
+
+        $('#txtProducto').keyup(function(e){
+            consulta = $("#txtProducto").val();
+            $.ajax({
+            data: {'nombre': consulta},
+            url: '{% url 'Busqueda' %}',
+            type: 'get',
+            success : function(data) {
+                if(data.length > 2) {
+                    $('#listaProductos').empty()
+                    let listaJSON = JSON.parse(data)
+
+                    for(let i in listaJSON) {
+                        $('#listaProductos').append(`
+                            <option onClick="agregarAlCarrito(`+listaJSON[i].id+`,'`+listaJSON[i].nombre+`','`+listaJSON[i].precio_actual+`')" value="`+listaJSON[i].id+`">`+ listaJSON[i].nombre+`</option>
+                        `);
+                    }
+                } else {
+                    $('#listaProductos').empty()
+                }
+            },
+                error : function(message) {
+                console.log(message);
+                }
+            });
+        });
+
+        function agregarAlCarrito(id, nombre, precio) {
+            let producto;
+            let NoExiste = true;
+            if(carrito.length > 0) {
+                for (let i = 0; i < carrito.length; i++) {
+                    if (carrito[i].id == id) {
+                        carrito[i].cantidad = carrito[i].cantidad + 1;
+                        $('#'+id+'c').text(carrito[i].cantidad)
+                        let total = $('#th-total').text()
+                        $('#th-total').text(Number(total)+Number(precio))
+                        NoExiste = false;
+                        break;
+                    }
+                }
+                if (NoExiste) {
+                    producto = {'id': id, 'cantidad': 1}
+                    carrito.push(producto);
+                    $('#tbody-productos').append(`
+                        <tr>
+                            <td style="display: flex; justify-content: space-between">`+nombre+`<button onclick="eli">eliminar</button></td>
+                            <td id="`+id+`c">`+producto.cantidad+`</td>
+                            <td>`+precio+`</td>
+
+                        </tr>
+                    `)
+                    let total = $('#th-total').text()
+                    $('#th-total').text(Number(total)+Number(precio))
+                }
+            } else {
+                producto = {'id': id, 'cantidad': 1}
+                carrito.push(producto);
+                $('#tbody-productos').append(`
+                    <tr>
+                        <td style="display: flex; justify-content: space-between">`+nombre+`<button onclick="eli">eliminar</button></td>
+                        <td id="`+id+`c">`+producto.cantidad+`</td>
+                        <td>`+precio+`</td>
+                    </tr>
+                `)
+                let total = $('#th-total').text()
+                $('#th-total').text(Number(total)+Number(precio))
+            }
+            total_total = Number($('#th-total').text());
+        }
+
+        function realizarVenta() {
+            if(total_total > 0) {
+                let obj = {'carrito': carrito, 'total': total_total}
+                $.ajax({
+                    data: obj,
+                    url: '{% url 'Realizar venta' %}',
+                    type: 'get'
+                }).done(function (response) {
+                    $('#modalFactura').modal('show');
+                    ultimaVentaID = response;
+                    //alert('Venta realizada con exito');
+                    //window.location.reload()
+                })
+            } else {
+                alert('El carrito está vacío');
+            }
+        }
+
+        // Modal de anular venta
+        let venta_id = 0;
+        function confirmarAnular(id) {
+            venta_id = id;
+        }
+
+        function anularVenta() {
+            let motivo = $('#motivo').val();
+            if(motivo != null && motivo != "") {
+                $.ajax({
+                    url: '{% url 'Anular venta' %}',
+                    data: {'venta_id': venta_id, 'motivo': motivo},
+                    type: 'get'
+                }).done(function (response) {
+                    window.location.reload()
+                });
+            } else {
+                $('#mensaje-motivo').text('Debe ingresar un motivo para anular la venta');
+            }
+        }
+
+        function emitirFactura() {
+            let nombre = $('#factura-nombre').val();
+            let nit = $('#factura-nit').val();
+
+            if(nombre != null && nombre != '' && nit != null && nit != '') {
+                $.ajax({
+                    url: '{% url 'Emitir factura' %}',
+                    data: {'venta_id': ultimaVentaID, 'factura_nombre': nombre, 'factura_nit': nit},
+                    type: 'get'
+                }).done(function (response) {
+                    window.location.reload()
+                })
+            } else {
+                $('#mensaje-factura').text('Debe ingresar los datos correspondientes');
+            }
+        }
+
+        function reload() {
+            window.location.reload()
+        }
+    </script>
+    </body>
+</html>

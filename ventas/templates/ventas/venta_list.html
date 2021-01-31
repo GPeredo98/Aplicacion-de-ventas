@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div style="display: flex; flex-direction:column ;justify-content: center; align-items: center; padding-top: 30px">
+        <div style="padding: 10px; display: flex; justify-content: space-between; width: 80%">
+            <h3>Historial de ventas</h3>
+        </div>
+        {% if venta_list %}
+        <table class="table table-sm table-bordered table-hover" style="width: 80%">
+            <thead class="thead-light">
+                <tr>
+                    <th>Codigo</th>
+                    <th>Fecha hora</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Nombre</th>
+                    <th>NIT</th>
+                    <th>Motivo de anulación</th>
+                    <th style="width: 10%;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venta in venta_list %}
+                    <tr>
+                        <td>{{ venta.codigo }}</td>
+                        <td>{{ venta.fecha_hora }}</td>
+                        <td>{{ venta.total }}</td>
+                        <td>{{ venta.estado }}</td>
+                        {% if venta.factura_nombre is not None %}<td>{{ venta.factura_nombre }}</td>{% else %}<td></td>{% endif %}
+                        {% if venta.factura_nit is not None %}<td>{{ venta.factura_nit }}</td>{% else %}<td></td>{% endif %}
+                        {% if venta.motivo_anulacion is not None %}<td>{{ venta.motivo_anulacion }}</td>{% else %}<td></td>{% endif %}
+                        <td class="th-buttons">
+                            <a class="link-button" style="background: cornflowerblue" href="{% url 'Ver detalle venta' venta.id %}">
+                                <i class="fas fa-eye fa-fw"></i>
+                            </a>
+                            <a class="link-button" style="background: darkseagreen" href="{% url 'Ventas editar' venta.id %}">
+                                <i class="fas fa-pen fa-fw"></i>
+                            </a>
+                            {% if venta.estado != -2 %}
+                                <a class="link-button" style="background: lightcoral" href="#" data-toggle="modal" onclick="confirmarAnular({{ venta.id }})" data-target="#exampleModalCenter">
+                                    <i class="fas fa-times fa-fw"></i>
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <h2>No hay nada</h2>
+        {% endif %}
+
+    <!-- Modal -->
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Escriba el motivo de anulación de venta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form  method="post">
+                {% csrf_token %}
+                  <div class="form-group">
+                    <label for="motivo">Motivo</label>
+                      <input type="text" class="form-control" id="motivo">
+                  </div>
+                    <p style="text-align: center; color: red" id="mensaje-motivo"></p>
+                    <div style="display: flex; justify-content: center">
+                    <div>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">CANCELAR</button>
+                        <button type="button" class="btn btn-warning" onclick="anularVenta()">GUARDAR</button>
+                    </div>
+                </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal -->
+
+    </div>
+{% endblock %}

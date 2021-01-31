@@ -1,0 +1,16 @@
+
+    body {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    .main {
+      flex: 1;
+    }
+
+    .footer {
+        background-color: red;
+        width: 100%;
+        min-height: 60px;
+    }
